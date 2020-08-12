@@ -1,0 +1,3 @@
+Motor.c:16:5:run_motor_n	40	static
+Motor.c:42:5:send_ctrlwrd_1	24	static
+Motor.c:61:5:send_ctrlword_2	24	static

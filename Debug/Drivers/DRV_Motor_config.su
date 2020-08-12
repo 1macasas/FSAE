@@ -1,0 +1,5 @@
+DRV_Motor_config.c:17:5:run_motor_n	48	static
+DRV_Motor_config.c:45:5:send_ctrlwrd_1	24	static
+DRV_Motor_config.c:64:5:send_ctrlword_2	24	static
+DRV_Motor_config.c:86:5:analize_CAN_Rx	40	static
+DRV_Motor_config.c:161:5:ask_for_info	24	static
