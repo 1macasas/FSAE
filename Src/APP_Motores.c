@@ -16,6 +16,7 @@
 /*La funcion va a manejar la info de los motores
  * y el status (variables del main), y se va a encargar de controlar
  * los motores y actualizar la misma */
+ extern UART_HandleTypeDef huart3;
 
 void control_motors(int throttle,int direction,int brake)
 {
@@ -30,6 +31,13 @@ void control_motors(int throttle,int direction,int brake)
 	{
 	analize_CAN_Rx(pRxHeader,buffer_Rx_msg);
 	FLAG_CAN=0;			//bajo el flag
+	}
+
+	if(FLAG_USART==49)
+	{
+		Pc_Communication(info_motores);
+		FLAG_USART=0;
+	//	HAL_UART_Receive_DMA(&huart3,&FLAG_USART,1);
 	}
 
 	// tiempos

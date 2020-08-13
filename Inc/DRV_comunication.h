@@ -15,6 +15,8 @@
 /*Private Function*/
 int can1_Tx(uint16_t Id ,uint8_t mensaje [],uint8_t bytes);
 
+int Pc_Communication(uint16_t Data[]) ;
+
 /*extern functions*/
 extern void Error_Handler(void);
 

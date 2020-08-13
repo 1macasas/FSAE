@@ -71,8 +71,8 @@ uint32_t TxMailbox;
 // El RX header va a tener la info que me llega de CAN
 CAN_RxHeaderTypeDef pRxHeader;
 uint16_t status[2];
-uint16_t FLAG_OP,FLAG_CAN ;
-int info_motores[18];
+uint8_t FLAG_OP,FLAG_CAN,FLAG_USART ;
+uint16_t info_motores[18];
 
 
 //extern uint8_t	 UART_Tx_Data[];

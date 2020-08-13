@@ -1,1 +1,2 @@
-DRV_comunication.c:22:5:can1_Tx	16	static
+DRV_comunication.c:23:5:can1_Tx	16	static
+DRV_comunication.c:43:5:Pc_Communication	24	static

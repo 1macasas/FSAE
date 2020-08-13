@@ -30,15 +30,27 @@ void mysystem_start(void)
 		/*Inicio ADC con DMA */
 	  HAL_ADC_Start_DMA(&hadc1,ADC_val, 2);
 
+	  /*TIMER 2 PARA FUNCIONES.
+	   * (Creo que no lo uso al final se puede eliminar
+	   * */
 	  HAL_TIM_Base_Start_IT(&htim2);
 
+	  FLAG_USART=0;
+	  /*Inicio USART3*/
+	  HAL_UART_Receive_DMA(&huart3,&FLAG_USART,1);
 
 
-
-		/*Inicio*/
+		/*Inicio mis variables y FLAGS*/
 	  status[0]= INITIALIZATION;
 	  status[1]= INITIALIZATION;
 	  FLAG_OP=0;
+	  FLAG_CAN=0;
+
+	  uint8_t i;
+	  for(i=0;i<18;i++)
+	  {
+		  info_motores[i]=0xFFFF;
+	  }
 
 }
 

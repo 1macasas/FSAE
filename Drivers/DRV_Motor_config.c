@@ -9,7 +9,7 @@
 #include "DRV_Motor_config.h"
 
 extern uint16_t status[2];
-extern int info_motores[18];
+extern uint16_t info_motores[18];
 
 /*La funcion pone en movimiento el motor del nodo indicado, debe recibir
  *  el valor del nodo (1 o 2), el valor al cual se desea mover y el estado del nodo,

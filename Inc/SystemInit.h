@@ -26,7 +26,9 @@ extern CAN_HandleTypeDef hcan1;
 extern TIM_HandleTypeDef htim2;
 
 //FLAGS
-extern uint16_t FLAG_OP;
+extern uint8_t FLAG_OP;
+extern uint8_t FLAG_CAN;
+extern uint8_t FLAG_USART;
 
 //UART
 extern uint8_t	 UART_Tx_Data[];

@@ -48,7 +48,7 @@ extern uint16_t status[2];
 extern uint8_t	buffer_Rx_msg[8];
 extern CAN_RxHeaderTypeDef buffer_header,pRxHeader;
 extern int throttle,direction;
-extern uint16_t FLAG_OP,FLAG_CAN;
+extern uint8_t FLAG_OP,FLAG_CAN;
 extern uint32_t ADC_val[2];
 
 // inicio USART con DMA
@@ -75,6 +75,7 @@ extern CAN_HandleTypeDef hcan1;
 extern TIM_HandleTypeDef htim2;
 extern DMA_HandleTypeDef hdma_usart3_rx;
 extern DMA_HandleTypeDef hdma_usart3_tx;
+extern UART_HandleTypeDef huart3;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -286,14 +287,26 @@ void TIM2_IRQHandler(void)
 		FLAG_OP = !FLAG_OP;
 	}
 
-	  HAL_UART_Transmit_DMA(&huart3, info_motores, Info_motores_size);
-
   /* USER CODE END TIM2_IRQn 0 */
   HAL_TIM_IRQHandler(&htim2);
   /* USER CODE BEGIN TIM2_IRQn 1 */
 
   last=now;
   /* USER CODE END TIM2_IRQn 1 */
+}
+
+/**
+  * @brief This function handles USART3 global interrupt.
+  */
+void USART3_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART3_IRQn 0 */
+
+  /* USER CODE END USART3_IRQn 0 */
+  HAL_UART_IRQHandler(&huart3);
+  /* USER CODE BEGIN USART3_IRQn 1 */
+
+  /* USER CODE END USART3_IRQn 1 */
 }
 
 /**
