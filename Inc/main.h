@@ -30,9 +30,10 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f7xx_hal.h"
 
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "board.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -61,7 +62,7 @@ void mysystem_start(void);
 /* USER CODE BEGIN Private defines */
 
 // Mis variables de informacion global
-uint32_t ADC_val[2];   // valores donde voy a alojar los datos del adc
+uint32_t ADC_val[ENTRADAS_ADC];   // valores donde voy a alojar los datos del adc
 
 
 /*Acomodo las variables que le voy a pasar a la app motores.

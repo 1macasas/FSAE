@@ -33,7 +33,10 @@
 #define SEMI_SEND 2
 
 //UART
-#define UART_SIZE 8
+#define UART_SIZE 12
 #define Info_motores_size 18
+//
+#define ENTRADAS_ADC 3
+
 
 #endif /* BOARD_H_ */

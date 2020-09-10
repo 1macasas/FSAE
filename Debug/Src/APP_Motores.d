@@ -32,7 +32,8 @@ Src/APP_Motores.o: ../Src/APP_Motores.c ../Inc/APP_Motores.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h \
- ../Inc/DRV_Motor_config.h ../Inc/board.h ../Inc/DRV_comunication.h
+ ../Inc/board.h ../Inc/DRV_Motor_config.h ../Inc/DRV_comunication.h \
+ ../Inc/mini_backend.h
 
 ../Inc/APP_Motores.h:
 
@@ -104,8 +105,10 @@ Src/APP_Motores.o: ../Src/APP_Motores.c ../Inc/APP_Motores.h \
 
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h:
 
-../Inc/DRV_Motor_config.h:
-
 ../Inc/board.h:
 
+../Inc/DRV_Motor_config.h:
+
 ../Inc/DRV_comunication.h:
+
+../Inc/mini_backend.h:

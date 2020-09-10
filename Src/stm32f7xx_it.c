@@ -49,7 +49,7 @@ extern uint8_t	buffer_Rx_msg[8];
 extern CAN_RxHeaderTypeDef buffer_header,pRxHeader;
 extern int throttle,direction;
 extern uint8_t FLAG_OP,FLAG_CAN;
-extern uint32_t ADC_val[2];
+extern uint32_t ADC_val[3];
 
 // inicio USART con DMA
 uint8_t	 UART_Tx_Data[]="aca  va la info \n\r";

@@ -28,7 +28,7 @@ void mysystem_start(void)
 	  HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig);
 
 		/*Inicio ADC con DMA */
-	  HAL_ADC_Start_DMA(&hadc1,ADC_val, 2);
+	  HAL_ADC_Start_DMA(&hadc1,ADC_val, ENTRADAS_ADC);
 
 	  /*TIMER 2 PARA FUNCIONES.
 	   * (Creo que no lo uso al final se puede eliminar
@@ -47,6 +47,8 @@ void mysystem_start(void)
 	  FLAG_CAN=0;
 
 	  uint8_t i;
+
+	  /// esto es para prueba con software, se tiene que borrar
 	  for(i=0;i<18;i++)
 	  {
 		  info_motores[i]=0xFFFF;

@@ -50,7 +50,7 @@ int Pc_Communication(uint16_t Data[])
 
 
 		//hago un casteo a info_motores. EL DMA transmite 8-16 bits
-	if(HAL_UART_Transmit_DMA(&huart3, Data, 2*Info_motores_size) != HAL_OK)
+	if(HAL_UART_Transmit_DMA(&huart3, Data, 2*UART_SIZE) != HAL_OK)
 	{
 		return HAL_ERROR;
 	}

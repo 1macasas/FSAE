@@ -24,6 +24,7 @@
 "Src/APP_Motores.o"
 "Src/SystemInit.o"
 "Src/main.o"
+"Src/mini_backend.o"
 "Src/stm32f7xx_hal_msp.o"
 "Src/stm32f7xx_it.o"
 "Src/syscalls.o"

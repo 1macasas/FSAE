@@ -11,6 +11,7 @@
 //cycles va a tener la relacion entre pido data-envio velocidad.
  int cycles=0;
  char freq=2; //ms
+uint16_t info_UART[UART_SIZE];
 
 /******************************/
 /*La funcion va a manejar la info de los motores
@@ -35,9 +36,10 @@ void control_motors(int throttle,int direction,int brake)
 
 	if(FLAG_USART==49)
 	{
-		Pc_Communication(info_motores);
+		preparo_data_uart(info_UART); 	//primero acomodo y elijo la info a enviar
+		Pc_Communication(info_UART);	//envio info
 		FLAG_USART=0;
-	//	HAL_UART_Receive_DMA(&huart3,&FLAG_USART,1);
+
 	}
 
 	// tiempos
@@ -56,7 +58,7 @@ void control_motors(int throttle,int direction,int brake)
 			break;
 
 		case(WFBOOTUP):
-				//UN VEZ QUE LLEGA MSJ BOOTUP
+				//ESTOY ESPERANDO QUE LOS NODOS ESTEN READY
 				break;
 
 		case(PREOPERATIONAL):
@@ -107,8 +109,10 @@ void control_motors(int throttle,int direction,int brake)
 					}
 					else if (cycles==5)
 					{
-						run_motor_n(nodo,throttle,status[nodo-1]);
-						cycles++;
+						if(run_motor_n(nodo,throttle,status[nodo-1])==HAL_OK)
+							{
+							cycles++;
+							}
 					}
 					break;
 

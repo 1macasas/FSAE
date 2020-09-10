@@ -116,11 +116,11 @@ int analize_CAN_Rx(CAN_RxHeaderTypeDef header,uint8_t mensaje [])
 				info=(info<<8)+volatil;
 			}
 
-			if (index==0x2087)	//velocity actual value
+			if (index==0x2087)	        //velocity actual value
 			{
 				info_motores[nodo-1]=info;
 			}
-			else if (index==0x7960)	//DC Link actual voltage
+			else if (index==0x7960)	    //DC Link actual voltage
 			{
 				info_motores[1+nodo]=info;
 			}

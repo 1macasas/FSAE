@@ -121,6 +121,7 @@ int main(void)
   while (1)
       {
 	  direction=ADC_val[1];
+	  throttle=ADC_val[0];
 	  brake=0;
 
 	  control_motors(throttle,direction,brake);

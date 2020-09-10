@@ -19,7 +19,7 @@ extern uint16_t status[2];
 //ADC
 extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_adc1;
-extern uint32_t ADC_val[2];
+extern uint32_t ADC_val[ENTRADAS_ADC];
 //CAN
 extern CAN_HandleTypeDef hcan1;
 // TIMER
