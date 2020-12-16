@@ -55,8 +55,24 @@ DMA_HandleTypeDef hdma_usart3_rx;
 DMA_HandleTypeDef hdma_usart3_tx;
 
 /* USER CODE BEGIN PV */
+
 //esto no es global, solo del main
 int throttle,direction,brake;
+
+// Mis variables de informacion global
+uint32_t ADC_val[ENTRADAS_ADC];   // valores donde voy a alojar los datos del adc
+
+
+/*Acomodo las variables que le voy a pasar a la app motores.
+ * La info motor esta ordenada de forma:*/
+uint8_t	buffer_Rx_msg[8];
+uint32_t TxMailbox1,TxMailbox2,TxMailbox3;
+
+// El RX header va a tener la info que me llega de CAN
+CAN_RxHeaderTypeDef pRxHeader;
+uint16_t status[2];
+uint8_t FLAG_OP,FLAG_CAN,FLAG_USART ;
+int velocity[2],DcLink[2],DcCurrent[2],MotorTemp[2],MotorCrr[2],Torque[2],VelocityAVG[2],ControllerTemp[2],VelocityAct[2];
 
 /* USER CODE END PV */
 

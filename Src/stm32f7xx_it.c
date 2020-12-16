@@ -269,8 +269,17 @@ void CAN1_RX0_IRQHandler(void)
   HAL_CAN_IRQHandler(&hcan1);
   /* USER CODE BEGIN CAN1_RX0_IRQn 1 */
   //inicial
+  //if(FLAG_CAN==READY)
+  //{
   HAL_CAN_GetRxMessage(&hcan1,CAN_RX_FIFO0 , &pRxHeader, buffer_Rx_msg);
-  FLAG_CAN=1;
+  FLAG_CAN=PENDING;
+  //		if( (pRxHeader.StdId>=0x600) && (pRxHeader.StdId<=0x605) )		//si esta entre estos es un msg del master y no lo guardo
+  //		  FLAG_CAN=READY;
+  //}
+  //else
+  //{
+  //	  Error_Handler();
+  //}
   /* USER CODE END CAN1_RX0_IRQn 1 */
 }
 

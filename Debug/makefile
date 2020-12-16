@@ -41,8 +41,8 @@ CANT.bin \
 all: CANT.elf secondary-outputs
 
 # Tool invocations
-CANT.elf: $(OBJS) $(USER_OBJS) C:\Users\manum\Desktop\FORMULA\ SAE\Archivos\CANT\STM32F767ZITX_FLASH.ld
-	arm-none-eabi-gcc -o "CANT.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\manum\Desktop\FORMULA SAE\Archivos\CANT\STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="CANT.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+CANT.elf: $(OBJS) $(USER_OBJS) C:\Users\manum\Documents\Facu\FORMULA\ SAE\Archivos\CANT\STM32F767ZITX_FLASH.ld
+	arm-none-eabi-gcc -o "CANT.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\manum\Documents\Facu\FORMULA SAE\Archivos\CANT\STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="CANT.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

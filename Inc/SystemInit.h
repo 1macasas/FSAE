@@ -16,6 +16,8 @@
 
 extern uint16_t status[2];
 
+
+
 //ADC
 extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_adc1;

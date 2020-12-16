@@ -32,7 +32,7 @@ Src/mini_backend.o: ../Src/mini_backend.c ../Inc/mini_backend.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h \
- ../Inc/board.h
+ ../Inc/board.h ../Inc/UART_COM.h
 
 ../Inc/mini_backend.h:
 
@@ -105,3 +105,5 @@ Src/mini_backend.o: ../Src/mini_backend.c ../Inc/mini_backend.h \
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h:
 
 ../Inc/board.h:
+
+../Inc/UART_COM.h:

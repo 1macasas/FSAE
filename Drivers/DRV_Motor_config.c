@@ -7,24 +7,36 @@
 
 
 #include "DRV_Motor_config.h"
+#include "DRV_CAN.h"
 
 extern uint16_t status[2];
-extern uint16_t info_motores[18];
+extern int velocity[2],DcLink[2],DcCurrent[2],MotorTemp[2],MotorCrr[2],Torque[2],VelocityAVG[2],ControllerTemp[2],VelocityAct[2];
 
 /*La funcion pone en movimiento el motor del nodo indicado, debe recibir
  *  el valor del nodo (1 o 2), el valor al cual se desea mover y el estado del nodo,
  *  si el nodo no se encuentra en estado operacional no se realiza accion*/
-int run_motor_n(uint16_t node,uint32_t in,uint16_t state)
+
+char run_motor_n(uint32_t pedal1,uint32_t pedal2)
 {
-//	if(state==OPERATIONAL)
-//	{
+	static int now=0,last=0,node=1;
+	uint32_t v,a,b,c,d;
+	uint8_t VEL[8]; //velocidad a enviar por can.
+		now=HAL_GetTick();
 		// Actualizo valor de Velocidad
-		uint8_t VEL[8]; //velocidad a enviar por can.
-					int v=(in)*(5000/4095);
-					uint32_t a=((v)&(0x000000FF));
-					uint32_t b=((v)&(0x0000FF00))>>(8);
-					uint32_t c=((v)&(0x00FF0000))>>(16);
-					uint32_t d=((v)&(0xFF000000))>>(24);
+		if (now-last>50)			//ms??
+		{
+		if (node==1)
+			v=(pedal1*500)/4095;
+		else if(node==2)
+			v=(pedal2*500)/4095;
+
+		if (v<10)
+			v=0;
+
+		a=((v)&(0x000000FF));
+		b=((v)&(0x0000FF00))>>(8);
+		c=((v)&(0x00FF0000))>>(16);
+		d=((v)&(0xFF000000))>>(24);
 		VEL[0]=0x23;
 		VEL[1]=0xff;
 		VEL[2]=0x60;
@@ -33,12 +45,22 @@ int run_motor_n(uint16_t node,uint32_t in,uint16_t state)
 		VEL[5]=b;
 		VEL[6]=c;
 		VEL[7]=d;
-		if(can1_Tx(0x600+node,VEL,8)!=HAL_OK)
+			if(can1_Tx(0x600+node,VEL,8)!=HAL_OK)
 				{
 					Error_Handler();
 					return HAL_ERROR;
 				}
-//		}
+		last=now;
+		node++;
+		if(node==3)
+			node=1;
+		}
+		else if (now<last)
+			last=0;
+		else
+		{
+			return HAL_OK;
+		}
 	return HAL_OK;
 }
 
@@ -83,74 +105,93 @@ int send_ctrlword_2(uint16_t node)
 }
 
 // Recibo Mensaje-- debo pasarle las variables donde voy a guardar el ID, y el mensaje:
-int analize_CAN_Rx(CAN_RxHeaderTypeDef header,uint8_t mensaje [])
+char analize_CAN_Rx(uint32_t Id,uint8_t DLC,uint8_t mensaje [])
 {
-	uint32_t info=0,volatil=0;
-	uint16_t Id,bytes,index,subindex;
-	uint8_t n,ccs,e,s,contador,nodo;
+	uint32_t info,volatil;
+	uint16_t index,command_byte=0;		//,subindex
+	uint8_t ccs,contador,nodo;
 
-	Id=header.StdId;
-	bytes=header.DLC;
-	/*Vamos a analizar casos: mensaje de bootup, y mensaje sdo, podriamos agregar tpdo en un futuro*/
+	/*Vamos a analizar casos: mensaje de bootup, y mensaje sdo, podriamos agregar pdo en un futuro*/
 	/*ORDEN DE REVISION: MENSAJES DE MAYOR A MENOR ID*/
-		if(Id-0x700>0)
+		if(Id>0x700)
 		{
 			nodo=Id-0x700;
-			status[nodo-1]=PREOPERATIONAL;
+			if(status[nodo-1]==WFBOOTUP)
+				status[nodo-1]=GOTOPREOPERATIONAL;
 		}
 		// con revisar que sea mayor a cero  me alcanza porque sino hubiese entrado en el caso anterior
-		else if (Id-580>0)
+		else if (Id>0x600)
+			// ESTO NO DEBERIA PASAR, FILTRAR ANTES
+		{
+			return HAL_ERROR;
+		}
+		else if (Id>0x580)
 			// primero debo analizar el byte de comando
 			// Analisis CANOPEN
 		{
 		nodo=Id-0x580;
 		index= (mensaje[1]<<(8))|mensaje[2]	;
-		subindex=mensaje[3];
-		ccs=(mensaje[0]&ccs_MSK);
-		n=(mensaje[0]&n_MSK);
-		e=(mensaje[0]&e_MSK);
-		s=(mensaje[0]&s_MSK);
-			for(contador=(1+n);contador<(bytes-3);contador++)
-			{
-				volatil= mensaje[bytes-contador];
-				info=(info<<8)+volatil;
-			}
+		command_byte=mensaje[0];
+		ccs=(command_byte&ccs_MSK)>>(5);
+		info=0;
+		volatil=0;
+		//e=(mensaje[0]&e_MSK);
+		//s=(mensaje[0]&s_MSK);
+		//if(ccs!=2)
+		//	return HAL_OK;			// NO HAY ANALISIS POSIBLE EN ESTE MENSAJE
+		//
+		if(nodo<0)
+			return HAL_ERROR;
 
-			if (index==0x2087)	        //velocity actual value
+		if(ccs==3)					// ESTA VERIFICACION NO DEBERIA ESTAR
+		{
+			return HAL_OK;
+		}
+			for(contador=1;contador<(5);contador++)
 			{
-				info_motores[nodo-1]=info;
+				volatil= mensaje[DLC-contador];
+				info=((info<<8)|volatil);
+
 			}
-			else if (index==0x7960)	    //DC Link actual voltage
+			if(info==101253137)
 			{
-				info_motores[1+nodo]=info;
+					return HAL_ERROR;
 			}
-			else if (index==0x2320) 	//DC Current
+			if (index==VELOCITY)	        //velocity actual value
 			{
-				info_motores[3+nodo]=info;
+				velocity[nodo-1]=info;
 			}
-			else if (index==0x2520)		//Motor Temp
+			else if (index==DCLINK)	    //DC Link actual voltage
 			{
-				info_motores[5+nodo]=info;
+				DcLink[nodo-1]=info;
 			}
-			else if (index==0x7860)		// Motor Current Actual Value
+			else if (index==DC_CURRENT) 	//DC Current
 			{
-				info_motores[7+nodo]=info;
+				DcCurrent[nodo-1]=info;
 			}
-			else if (index==0x7760)		//Torque Actual Value
+			else if (index==MOTOR_TEMP)		//Motor Temp
 			{
-				info_motores[9+nodo]=info;
+				MotorTemp[nodo-1]=info;
+			}
+			else if (index==MOTOR_CRR)		// Motor Current Actual Value
+			{
+				MotorCrr[nodo-1]=info;
+			}
+			else if (index==TORQUE)		//Torque Actual Value
+			{
+				Torque[nodo-1]=info;
 			}
 			else if (index==0x6C60)		//Velocity actual Value
 			{
-				info_motores[11+nodo]=info;
+				VelocityAct[nodo-1]=info;
 			}
-			else if (index==0x8620)		// Velocity actual value AVG
+			else if (index==VELOCITY_AVG)		// Velocity actual value AVG
 			{
-				info_motores[13+nodo]=info;
+				VelocityAVG[nodo-1]=info;
 			}
-			else if (index==0x2620)		//controller temperature
+			else if (index==CONTROLLER_TEMP)		//controller temperature
 			{
-				info_motores[15+nodo]=info;
+				ControllerTemp[nodo-1]=info;
 			}
 		}
 
@@ -158,11 +199,17 @@ int analize_CAN_Rx(CAN_RxHeaderTypeDef header,uint8_t mensaje [])
 }
 
 /*La funcion envia el mensaje SDO para pedir data al nodo indicado*/
-int ask_for_info(uint8_t node , uint8_t contador)
+
+int ask_for_info(void)
 {
 	/*inicio la variable en cero, voy a pedir 9 datos*/
+	static int now=0,last=0;
+	static uint8_t node=1,contador=1;
 	uint8_t PIDO_INFO[8];
 	/*primero command byte, luego index y subindex*/
+	now=HAL_GetTick();
+	if (now-last>10)			//ms??
+	{
 	PIDO_INFO[0]=0x40;
 	if (contador==1)	//velocity actual value
 	{
@@ -217,11 +264,51 @@ int ask_for_info(uint8_t node , uint8_t contador)
 				PIDO_INFO[3]=0xC1;
 	}
 
-	if(can1_Tx(0x600+node,PIDO_INFO,8)!=HAL_OK)
+
+	if(can1_Tx(0x600+node,PIDO_INFO,8)==HAL_OK)
 			{
-				Error_Handler();
-				return HAL_ERROR;
+				last=now;
+				node++;
+				if(node==3)
+					node=1;
+				contador++;
+					if(contador>10)
+						contador=0;
+				return HAL_OK;
 			}
+	}
+
+}
+
+char send_NMT(uint8_t command)
+{
+	/*Envio mensaje NMT para pasar a OPERACIONAL-PREOPERACIONAL*/
+	uint8_t NMT[2];
+	NMT[1]=0;
+	if(command==START)
+		NMT[0]=0x01;		        //START
+	else if(command==RESTART)
+		NMT[0]=0X81;
+	else if(command==PREOPERATIONAL)
+		NMT[0]=0X80;
+	can1_Tx(0x000,NMT,2);
+
+	HAL_Delay(20);			//DELAY BLOQUEANTE
+
 	return HAL_OK;
 }
 
+char change_state(uint8_t nodo,uint8_t state, uint8_t status)
+{
+		HAL_Delay(100);
+		if(send_ctrlwrd_1(nodo)== HAL_OK)
+			//control_nodos[nodo-1]=SEMI_SEND;
+
+		HAL_Delay(100);			//DELAY BLOQUEANTE
+
+		if(send_ctrlword_2(nodo)==HAL_OK)
+			//control_nodos[nodo-1]=SEND;
+
+		HAL_Delay(100);			//DELAY BLOQUEANTE
+		return SEND;
+}

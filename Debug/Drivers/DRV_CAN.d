@@ -1,5 +1,4 @@
-Drivers/DRV_comunication.o: ../Drivers/DRV_comunication.c \
- ../Inc/DRV_comunication.h ../Inc/main.h \
+Drivers/DRV_CAN.o: ../Drivers/DRV_CAN.c ../Inc/DRV_CAN.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h \
  ../Inc/stm32f7xx_hal_conf.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rcc.h \
@@ -35,9 +34,7 @@ Drivers/DRV_comunication.o: ../Drivers/DRV_comunication.c \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h \
  ../Inc/board.h
 
-../Inc/DRV_comunication.h:
-
-../Inc/main.h:
+../Inc/DRV_CAN.h:
 
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h:
 

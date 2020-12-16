@@ -30,7 +30,6 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f7xx_hal.h"
 
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "board.h"
@@ -60,20 +59,6 @@ void mysystem_start(void);
 
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
-
-// Mis variables de informacion global
-uint32_t ADC_val[ENTRADAS_ADC];   // valores donde voy a alojar los datos del adc
-
-
-/*Acomodo las variables que le voy a pasar a la app motores.
- * La info motor esta ordenada de forma:*/
-uint8_t	buffer_Rx_msg[8];
-uint32_t TxMailbox;
-// El RX header va a tener la info que me llega de CAN
-CAN_RxHeaderTypeDef pRxHeader;
-uint16_t status[2];
-uint8_t FLAG_OP,FLAG_CAN,FLAG_USART ;
-uint16_t info_motores[18];
 
 
 //extern uint8_t	 UART_Tx_Data[];

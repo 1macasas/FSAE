@@ -1,5 +1,7 @@
-DRV_Motor_config.c:17:5:run_motor_n	48	static
-DRV_Motor_config.c:45:5:send_ctrlwrd_1	24	static
-DRV_Motor_config.c:64:5:send_ctrlword_2	24	static
-DRV_Motor_config.c:86:5:analize_CAN_Rx	40	static
-DRV_Motor_config.c:161:5:ask_for_info	24	static
+DRV_Motor_config.c:19:6:run_motor_n	48	static
+DRV_Motor_config.c:67:5:send_ctrlwrd_1	24	static
+DRV_Motor_config.c:86:5:send_ctrlword_2	24	static
+DRV_Motor_config.c:108:6:analize_CAN_Rx	48	static
+DRV_Motor_config.c:203:5:ask_for_info	16	static
+DRV_Motor_config.c:283:6:send_NMT	24	static
+DRV_Motor_config.c:301:6:change_state	16	static

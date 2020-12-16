@@ -1,2 +1,1 @@
-DRV_CAN.c:15:5:can1_Tx	16	static
-DRV_CAN.c:36:5:can1_Rx	16	static
+DRV_CAN.c:23:6:can1_Tx	16	static

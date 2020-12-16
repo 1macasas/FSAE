@@ -12,7 +12,7 @@
 #include "board.h"
 
 /*Functions*/
-void preparo_data_uart(uint16_t vector[]);
+void preparo_y_envio_data_uart(void);
 
 
 #endif /* MINI_BACKEND_H_ */

@@ -6,12 +6,23 @@
  */
 
 #include "APP_Motores.h"
+#include "DRV_Motor_config.h"
+#include "mini_backend.h"
 
+#include "main.h"
 /*private variables*/
 //cycles va a tener la relacion entre pido data-envio velocidad.
- int cycles=0;
- char freq=2; //ms
-uint16_t info_UART[UART_SIZE];
+int cycles=0;
+char freq=3; 												//ms
+/// variables externas
+extern uint8_t	buffer_Rx_msg[8];
+extern CAN_RxHeaderTypeDef pRxHeader;
+extern uint16_t status[2];
+extern int velocity[2],DcLink[2],DcCurrent[2],MotorTemp[2],MotorCrr[2],Torque[2],VelocityAVG[2],ControllerTemp[2],VelocityAct[2];
+extern uint8_t FLAG_OP;
+extern uint8_t FLAG_USART,FLAG_CAN;
+extern TIM_HandleTypeDef htim2;
+extern uint32_t ADC_val[ENTRADAS_ADC];
 
 /******************************/
 /*La funcion va a manejar la info de los motores
@@ -24,22 +35,30 @@ void control_motors(int throttle,int direction,int brake)
 	/*control_nodos es una variable se encarga de enviar la controlword a cada nodo, el contador va a controlar la data a pedir de los nodos*/
 	static uint8_t nodo=MOTOR1,control_nodos[2],contador[2];
 	static int tickstart;
+	uint32_t Id;
+	uint8_t buffer_analisis[8],i=0,bytes;
+	uint32_t pedal1,pedal2;
 
-	uint8_t NMT[2];
-	NMT[1]=0;
-	//
-	if(FLAG_CAN==1)
+	//	ANALIZO MENSAJE CAN-- SI HAY
+	//Armo un buffer de lectura, luego bajo el flag y analizo el mensaje
+	if(FLAG_CAN==PENDING)
 	{
-	analize_CAN_Rx(pRxHeader,buffer_Rx_msg);
-	FLAG_CAN=0;			//bajo el flag
+	FLAG_CAN=READING;
+	Id=pRxHeader.StdId;
+	bytes=pRxHeader.DLC;
+	for(i=1;i<8;i++)
+	{
+		buffer_analisis[i]=buffer_Rx_msg[i];
 	}
 
-	if(FLAG_USART==49)
-	{
-		preparo_data_uart(info_UART); 	//primero acomodo y elijo la info a enviar
-		Pc_Communication(info_UART);	//envio info
-		FLAG_USART=0;
+	FLAG_CAN=READY;								//bajo el flag
+	analize_CAN_Rx(Id,bytes,buffer_analisis);
+	}
 
+	if(FLAG_USART==49)					// SI TENGO PEDIDO DE ENVIO UART LO REALIZO
+	{
+		preparo_y_envio_data_uart(); 	//primero acomodo y elijo la info a enviar
+		FLAG_USART=0;
 	}
 
 	// tiempos
@@ -61,73 +80,70 @@ void control_motors(int throttle,int direction,int brake)
 				//ESTOY ESPERANDO QUE LOS NODOS ESTEN READY
 				break;
 
-		case(PREOPERATIONAL):
-
-				if (status[0]==PREOPERATIONAL && status[1]==PREOPERATIONAL)		// Si estan ambos en operational
+		case(GOTOPREOPERATIONAL):
+				if (status[0]==GOTOPREOPERATIONAL && status[1]==GOTOPREOPERATIONAL)		// Si estan ambos iniciados
 				{
 					HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, 1);		// prendo led verde
+					send_NMT(PREOPERATIONAL);
+					status[0]=PREOPERATIONAL;
+					status[1]=PREOPERATIONAL;
+				}
+				break;
+		case(PREOPERATIONAL):
 
 					if(FLAG_OP==1)
 					{
-						NMT[0]=0x01;		        //Pasar a operacional
-
-						if(can1_Tx(0x000,NMT,2)!=HAL_OK)
+						if(send_NMT(START)!=HAL_OK)
 						{
 							Error_Handler();
 							return;
 						}
+
 						HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);				// enciendo luz azul en caso operacional
 						status[0]=OPERATIONAL;
 						status[1]=OPERATIONAL;
 						FLAG_OP=0;											// UNA VEZ ENVIADO EL MSJ NMT BAJO EL FLAG
 					}
 
-			}
 
 			break;
 	/*Caso OPERATIONAL y Ctrl WORD enviada:*/
 		case(OPERATIONAL):
-					if(control_nodos[nodo-1]==NOTSEND)		// Pulso de pasar de preoperational a operational
+					if(control_nodos[nodo-1]==NOTSEND)
 					{
-						if( (HAL_GetTick()-tickstart>freq) )
-						{
-						if(send_ctrlwrd_1(nodo)== HAL_OK)
-							control_nodos[nodo-1]=SEMI_SEND;
+						control_nodos[nodo-1]= change_state(nodo,OPERATIONAL,status[nodo-1] );
 					}
-					else if(control_nodos[nodo-1]==SEMI_SEND)
+
+				if(run_motor_n(ADC_val[0],ADC_val[1])!=HAL_OK)
 					{
-						if(send_ctrlword_2(nodo)==HAL_OK)
-							control_nodos[nodo-1]=SEND;
+						Error_Handler();
+						return;
 					}
-					else if(FLAG_OP==1)
+
+					if(FLAG_OP==1)
 					{
 						status[0]=STOPPED;
 						status[1]=STOPPED;
 						FLAG_OP=0;
 					}
-						tickstart=HAL_GetTick();
-					}
-					else if (cycles==5)
-					{
-						if(run_motor_n(nodo,throttle,status[nodo-1])==HAL_OK)
-							{
-							cycles++;
-							}
-					}
 					break;
-
 		case(STOPPED):
 				control_nodos[0]=NOTSEND;
 				control_nodos[1]=NOTSEND;
 				status[0]=PREOPERATIONAL;
 				status[1]=PREOPERATIONAL;
+				if(send_NMT(RESTART)!=HAL_OK)
+				{
+					Error_Handler();
+					return;
+				}
 				HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
 				break;
 	}
 	/*Reseteo Variable control en el caso de volver a preoperational*/
-
-	/* controlo alternadamente motor 1 y motor 2 --- RESETEO VARUABKES
-	//control_nodos[nodo-1]=control;  // ???? en q esta ba pensando*/
+	/* controlo alternadamente motor 1 y motor 2 --- RESETEO VARUABLES
+	 *
+	 */
 	if(nodo==MOTOR1)
 	{
 		nodo=MOTOR2;
@@ -138,28 +154,8 @@ void control_motors(int throttle,int direction,int brake)
 	}
 
 	//PIDO INFO (CONSTANTEMENTE)---ciclos¿?7
+	ask_for_info();
 
-			if( (HAL_GetTick()-tickstart>freq) )
-			{
-				if((status[nodo-1]==OPERATIONAL && cycles==5) || (status[nodo-1]==PREOPERATIONAL && FLAG_OP==1))
-				{
-
-				}
-				else
-				{
-					if(ask_for_info( nodo ,contador[nodo-1])==HAL_OK)
-					{
-						contador[nodo-1]++;
-						cycles++;
-						tickstart=HAL_GetTick();
-						if(contador[nodo-1]>10)
-						{
-							contador[nodo-1]=1;
-							cycles=0;
-						}
-					}
-				}
-			}
  }
 
 

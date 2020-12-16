@@ -9,13 +9,11 @@
 #define DRV_CAN_H_
 /*Private includes*/
 
-#include "main.h"
+#include "stm32f7xx_hal.h"
 #include "board.h"
 
 /*Private Function*/
-int can1_Tx(uint16_t Id ,uint8_t mensaje [],uint8_t bytes);
-
-int Pc_Communication(uint16_t Data[]) ;
+char can1_Tx(uint16_t Id ,uint8_t mensaje [],uint8_t bytes);
 
 /*extern functions*/
 extern void Error_Handler(void);

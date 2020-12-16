@@ -7,6 +7,7 @@
 //
 #include "SystemInit.h"
 
+extern short int velocity[2],DcLink[2],DcCurrent[2],MotorTemp[2],MotorCrr[2],Torque[2],VelocityAVG[2],ControllerTemp[2],VelocityAct[2];
 CAN_FilterTypeDef sFilterConfig;
 
 void mysystem_start(void)
@@ -17,17 +18,17 @@ void mysystem_start(void)
 	  HAL_CAN_Start(&hcan1);
 
 		/*Inicio configuracion Filtro can*/
+	 sFilterConfig.FilterFIFOAssignment=CAN_FILTER_FIFO0;
+	 sFilterConfig.FilterIdHigh=0x245<<5;
+	 sFilterConfig.FilterIdLow=0;
+	 sFilterConfig.FilterMaskIdHigh=0;
+	 sFilterConfig.FilterMaskIdLow=0;
+	 sFilterConfig.FilterScale=CAN_FILTERSCALE_32BIT;
+	 sFilterConfig.FilterActivation=CAN_FILTER_ENABLE;
 
-	  sFilterConfig.FilterFIFOAssignment=CAN_FILTER_FIFO0;
-	  sFilterConfig.FilterIdHigh=0x245<<5;
-	  sFilterConfig.FilterIdLow=0;
-	  sFilterConfig.FilterMaskIdHigh=0;
-	  sFilterConfig.FilterMaskIdLow=0;
-	  sFilterConfig.FilterScale=CAN_FILTERSCALE_32BIT;
-	  sFilterConfig.FilterActivation=ENABLE;
-	  HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig);
+	 HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig);
 
-		/*Inicio ADC con DMA */
+	 /*Inicio ADC con DMA */
 	  HAL_ADC_Start_DMA(&hadc1,ADC_val, ENTRADAS_ADC);
 
 	  /*TIMER 2 PARA FUNCIONES.
@@ -46,14 +47,26 @@ void mysystem_start(void)
 	  FLAG_OP=0;
 	  FLAG_CAN=0;
 
-	  uint8_t i;
 
 	  /// esto es para prueba con software, se tiene que borrar
-	  for(i=0;i<18;i++)
-	  {
-		  info_motores[i]=0xFFFF;
-	  }
-
+	  velocity[0]=0xffff;
+	  velocity[1]=0xffff;
+	  DcLink[0]=0xffff;
+	  DcLink[1]=0xffff;
+	  DcCurrent[0]=0xffff;
+	  DcCurrent[1]=0xffff;
+	  MotorTemp[0]=0xffff;
+	  MotorTemp[1]=0xffff;
+	  MotorCrr[0]=0xffff;
+	  MotorCrr[1]=0xffff;
+	  Torque[0]=0xffff;
+	  Torque[1]=0xffff;
+	  VelocityAVG[0]=0xffff;
+	  VelocityAVG[1]=0xffff;
+	  ControllerTemp[0]=0xffff;
+	  ControllerTemp[1]=0xffff;
+	  VelocityAct[0]=0xffff;
+	  VelocityAct[1]=0xffff;
 }
 
 

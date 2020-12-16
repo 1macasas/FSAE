@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=C:/Users/manum/Desktop/FORMULA SAE/Archivos/CANT/Inc
+HeaderPath=C:/Users/manum/Documents/Facu/FORMULA SAE/Archivos/CANT/Inc
 HeaderFiles=stm32f7xx_it.h;stm32f7xx_hal_conf.h;main.h;
-SourcePath=C:/Users/manum/Desktop/FORMULA SAE/Archivos/CANT/Src
+SourcePath=C:/Users/manum/Documents/Facu/FORMULA SAE/Archivos/CANT/Src
 SourceFiles=stm32f7xx_it.c;stm32f7xx_hal_msp.c;main.c;
 
 [PreviousLibFiles]

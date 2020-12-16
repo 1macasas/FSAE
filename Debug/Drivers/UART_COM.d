@@ -1,5 +1,4 @@
-Drivers/DRV_Motor_config.o: ../Drivers/DRV_Motor_config.c \
- ../Inc/DRV_Motor_config.h ../Inc/board.h ../Inc/DRV_CAN.h \
+Drivers/UART_COM.o: ../Drivers/UART_COM.c ../Inc/UART_COM.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h \
  ../Inc/stm32f7xx_hal_conf.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rcc.h \
@@ -32,13 +31,10 @@ Drivers/DRV_Motor_config.o: ../Drivers/DRV_Motor_config.c \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h \
- ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h
+ ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h \
+ ../Inc/board.h
 
-../Inc/DRV_Motor_config.h:
-
-../Inc/board.h:
-
-../Inc/DRV_CAN.h:
+../Inc/UART_COM.h:
 
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h:
 
@@ -105,3 +101,5 @@ Drivers/DRV_Motor_config.o: ../Drivers/DRV_Motor_config.c \
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h:
 
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h:
+
+../Inc/board.h:
