@@ -43,16 +43,19 @@
 #define ENTRADAS_ADC 2
 
 //OBJECT INDEX
-#define VELOCITY 		0x6C60
-#define DCLINK 			0x7960
-#define DC_CURRENT 		0x2320
-#define MOTOR_TEMP 		0x2520
-#define MOTOR_CRR 		0x7860
-#define TORQUE 			0x7760
-#define VELOCITY_AVG 	0x8620
-#define CONTROLLER_TEMP 0x2620
-#define VELOCITY_ACTUAL 0x2087
-
+#define VELOCITY 			0x6C60
+#define DCLINK 				0x7960
+#define DC_CURRENT 			0x2320
+#define MOTOR_TEMP 			0x2520
+#define MOTOR_CRR 			0x7860
+#define MOTOR_CRR_SUB		0x2
+#define TORQUE 				0x7760
+#define VELOCITY_AVG 		0x8620
+#define CONTROLLER_TEMP	 	0x2620
+#define CONTROLLER_TEMP_SUB 0x1
+#define PHASE_A_CRR 		0x0F20
+#define PHASE_B_CRR 		0x1020
+#define WARNINGS			0x2720
 // CAN STATUS
 #define READY			0
 #define PENDING 		1

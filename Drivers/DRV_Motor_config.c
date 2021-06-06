@@ -9,8 +9,11 @@
 #include "DRV_Motor_config.h"
 #include "DRV_CAN.h"
 
+
 extern uint16_t status[2];
-extern int velocity[2],DcLink[2],DcCurrent[2],MotorTemp[2],MotorCrr[2],Torque[2],VelocityAVG[2],ControllerTemp[2],VelocityAct[2];
+extern int velocity[2],DcCurrent[2],MotorCrr[2],VelocityAVG[2];
+extern uint8_t MotorTemp[2],ControllerTemp[2];
+extern short int Phase_A_Crr[2],Phase_B_Crr[2],DcLink[2],Torque[2],Warnings[2];
 
 /*La funcion pone en movimiento el motor del nodo indicado, debe recibir
  *  el valor del nodo (1 o 2), el valor al cual se desea mover y el estado del nodo,
@@ -107,7 +110,7 @@ int send_ctrlword_2(uint16_t node)
 // Recibo Mensaje-- debo pasarle las variables donde voy a guardar el ID, y el mensaje:
 char analize_CAN_Rx(uint32_t Id,uint8_t DLC,uint8_t mensaje [])
 {
-	uint32_t info,volatil;
+	int info,B1,B2,B3,B4;
 	uint16_t index,command_byte=0;		//,subindex
 	uint8_t ccs,contador,nodo;
 
@@ -134,29 +137,14 @@ char analize_CAN_Rx(uint32_t Id,uint8_t DLC,uint8_t mensaje [])
 		command_byte=mensaje[0];
 		ccs=(command_byte&ccs_MSK)>>(5);
 		info=0;
-		volatil=0;
-		//e=(mensaje[0]&e_MSK);
-		//s=(mensaje[0]&s_MSK);
-		//if(ccs!=2)
-		//	return HAL_OK;			// NO HAY ANALISIS POSIBLE EN ESTE MENSAJE
-		//
 		if(nodo<0)
 			return HAL_ERROR;
+		B1=mensaje[7];
+		B2=mensaje[6];
+		B3=mensaje[5];
+		B4=mensaje[4];
+		info=B1<<(24)|B2<<(16)|B3<<(8)|B4;
 
-		if(ccs==3)					// ESTA VERIFICACION NO DEBERIA ESTAR
-		{
-			return HAL_OK;
-		}
-			for(contador=1;contador<(5);contador++)
-			{
-				volatil= mensaje[DLC-contador];
-				info=((info<<8)|volatil);
-
-			}
-			if(info==101253137)
-			{
-					return HAL_ERROR;
-			}
 			if (index==VELOCITY)	        //velocity actual value
 			{
 				velocity[nodo-1]=info;
@@ -181,10 +169,6 @@ char analize_CAN_Rx(uint32_t Id,uint8_t DLC,uint8_t mensaje [])
 			{
 				Torque[nodo-1]=info;
 			}
-			else if (index==0x6C60)		//Velocity actual Value
-			{
-				VelocityAct[nodo-1]=info;
-			}
 			else if (index==VELOCITY_AVG)		// Velocity actual value AVG
 			{
 				VelocityAVG[nodo-1]=info;
@@ -193,7 +177,20 @@ char analize_CAN_Rx(uint32_t Id,uint8_t DLC,uint8_t mensaje [])
 			{
 				ControllerTemp[nodo-1]=info;
 			}
+			else if (index==PHASE_A_CRR)		//Velocity actual Value
+			{
+				Phase_A_Crr[nodo-1]=info;
+			}
+			else if (index==PHASE_B_CRR)		//Velocity actual Value
+			{
+				Phase_B_Crr[nodo-1]=info;
+			}
+			else if (index==WARNINGS)		//Velocity actual Value
+			{
+				Warnings[nodo-1]=info;
+			}
 		}
+
 
 	  return HAL_OK ;
 }
@@ -206,6 +203,11 @@ int ask_for_info(void)
 	static int now=0,last=0;
 	static uint8_t node=1,contador=1;
 	uint8_t PIDO_INFO[8];
+	PIDO_INFO[3]=0;
+	PIDO_INFO[4]=0;
+	PIDO_INFO[5]=0;
+	PIDO_INFO[6]=0;
+	PIDO_INFO[7]=0;
 	/*primero command byte, luego index y subindex*/
 	now=HAL_GetTick();
 	if (now-last>10)			//ms??
@@ -213,55 +215,62 @@ int ask_for_info(void)
 	PIDO_INFO[0]=0x40;
 	if (contador==1)	//velocity actual value
 	{
-				PIDO_INFO[1]=0x87;
-				PIDO_INFO[2]=0x20;
+		PIDO_INFO[1]=((VELOCITY)&(0xFF00))>>(8);
+		PIDO_INFO[2]=(VELOCITY)&(0x00FF);
 	}
 	else if (contador==2)	//DC Link Actual Voltage
 	{
-				PIDO_INFO[1]=0x79;
-				PIDO_INFO[2]=0x60;
+		PIDO_INFO[1]=(DCLINK&(0xFF00))>>8;
+		PIDO_INFO[2]=DCLINK&(0x00FF);
 	}
 	else if (contador==3)	//Dc Current
 	{
-				PIDO_INFO[1]=0x23;
-				PIDO_INFO[2]=0x20;
+		PIDO_INFO[1]=(DC_CURRENT&(0xFF00))>>8;
+		PIDO_INFO[2]=DC_CURRENT&(0x00FF);
 	}
 	else if (contador==4)	//Motor Temperature
 	{
-				PIDO_INFO[1]=0x25;
-				PIDO_INFO[2]=0x20;
+		PIDO_INFO[1]=(MOTOR_TEMP&(0xFF00))>>8;
+		PIDO_INFO[2]=MOTOR_TEMP&(0x00FF);
 	}
 	else if (contador==5)	//Motor current actual value
 	{
-				PIDO_INFO[1]=0x78;
-				PIDO_INFO[2]=0x60;
+		PIDO_INFO[1]=(MOTOR_CRR&(0xFF00))>>8;
+		PIDO_INFO[2]=MOTOR_CRR&(0x00FF);
+		PIDO_INFO[3]=MOTOR_CRR_SUB;
+
 	}
 	else if (contador==6)	//Torque Actual Value
 	{
-				PIDO_INFO[1]=0x77;
-				PIDO_INFO[2]=0x60;
+		PIDO_INFO[1]=(TORQUE&(0xFF00))>>8;
+		PIDO_INFO[2]=TORQUE&(0x00FF);
 	}
-	else if (contador==7)	//velocity actual value
+	else if (contador==7)	//velocity AVG
 	{
-				PIDO_INFO[1]=0x6C;
-				PIDO_INFO[2]=0x60;
+		PIDO_INFO[1]=(VELOCITY_AVG&(0xFF00))>>8;
+		PIDO_INFO[2]=VELOCITY_AVG&(0x00FF);
 	}
-	else if (contador==8)	//velocity actual value AVG
+	else if (contador==8)	//Controller TEMP
 	{
-				PIDO_INFO[1]=0x86;
-				PIDO_INFO[2]=0x20;
+		PIDO_INFO[1]=(CONTROLLER_TEMP&(0xFF00))>>8;
+		PIDO_INFO[2]=CONTROLLER_TEMP&(0x00FF);
+		PIDO_INFO[3]=CONTROLLER_TEMP_SUB;
 	}
 	else if (contador==9)	//controller temperature
 	{
-				PIDO_INFO[1]=0x26;
-				PIDO_INFO[2]=0x20;
-				PIDO_INFO[3]=0x01;
+		PIDO_INFO[1]=(PHASE_A_CRR&(0xFF00))>>8;
+		PIDO_INFO[2]=PHASE_A_CRR&(0x00FF);
+
 	}
-	else if (contador==10)	//controller temperature
+	else if (contador==10)	//corriente en fase b
 	{
-				PIDO_INFO[1]=0x78;
-				PIDO_INFO[2]=0x60;
-				PIDO_INFO[3]=0xC1;
+		PIDO_INFO[1]=(PHASE_B_CRR&(0xFF00))>>8;
+		PIDO_INFO[2]=PHASE_B_CRR&(0x00FF);
+	}
+	else if (contador==11)	//corriente en fase b
+	{
+		PIDO_INFO[1]=(WARNINGS&(0xFF00))>>8;
+		PIDO_INFO[2]=WARNINGS&(0x00FF);
 	}
 
 
@@ -270,10 +279,12 @@ int ask_for_info(void)
 				last=now;
 				node++;
 				if(node==3)
+				{
 					node=1;
-				contador++;
-					if(contador>10)
-						contador=0;
+					contador++;
+					if(contador>11)
+						contador=1;
+				}
 				return HAL_OK;
 			}
 	}

@@ -8,9 +8,7 @@
 
 #ifndef MOTOR_H_
 #define MOTOR_H_
-
 #include "board.h"
-
 
 /*private functions*/
 int send_ctrlwrd_1(uint16_t node);

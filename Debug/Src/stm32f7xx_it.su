@@ -14,4 +14,3 @@ stm32f7xx_it.c:264:6:CAN1_RX0_IRQHandler	8	static
 stm32f7xx_it.c:289:6:TIM2_IRQHandler	8	static
 stm32f7xx_it.c:310:6:USART3_IRQHandler	8	static
 stm32f7xx_it.c:324:6:DMA2_Stream0_IRQHandler	8	static
-stm32f7xx_it.c:337:8:promedio	32	static

@@ -13,7 +13,9 @@
  * por la variable UART_SIZE.
  *  */
 extern uint16_t status[2];
-extern short int velocity[2],DcLink[2],DcCurrent[2],MotorTemp[2],MotorCrr[2],Torque[2],VelocityAVG[2],ControllerTemp[2],VelocityAct[2];
+extern int velocity[2],DcCurrent[2],MotorCrr[2],VelocityAVG[2];
+extern uint8_t MotorTemp[2],ControllerTemp[2];
+extern short int Phase_A_Crr[2],Phase_B_Crr[2],DcLink[2],Torque[2],Warnings[2];
 extern int throttle,direction,brake;
 
 //velocidad de motor 1,motor 2, crr 1, crr 2, temp 1 , temp 2 ,torq1 , torq2
@@ -27,12 +29,12 @@ void preparo_y_envio_data_uart(void)
 	info_UART[3]=MotorCrr[1];		//corriente motor 2
 	info_UART[4]=MotorTemp[0];		//temperatura motor 1
 	info_UART[5]=MotorTemp[1];		//temperatura motor 2
-	info_UART[6]=Torque[0];		//torque motor 1
-	info_UART[7]=Torque[1];		//torque motor 2
-	info_UART[8]=throttle;				//Posicion acelerador
+	info_UART[6]=Torque[0];			//torque motor 1
+	info_UART[7]=Torque[1];			//torque motor 2
+	info_UART[8]=throttle;			//Posicion acelerador
 	info_UART[9]=brake;				//Freno
-	info_UART[10]=direction;			//Volante
-	info_UART[11]=VelocityAct[0];	//VELOCIDAD ACTUAL DEL AUTO, VALOR INVENTADO, MODIFICAR.
+	info_UART[10]=direction;		//Volante
+	info_UART[11]=VelocityAVG[0];	//VELOCIDAD ACTUAL DEL AUTO, VALOR INVENTADO, MODIFICAR.
 
 	Pc_Communication(info_UART);	//envio info
 }

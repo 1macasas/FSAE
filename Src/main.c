@@ -72,7 +72,9 @@ uint32_t TxMailbox1,TxMailbox2,TxMailbox3;
 CAN_RxHeaderTypeDef pRxHeader;
 uint16_t status[2];
 uint8_t FLAG_OP,FLAG_CAN,FLAG_USART ;
-int velocity[2],DcLink[2],DcCurrent[2],MotorTemp[2],MotorCrr[2],Torque[2],VelocityAVG[2],ControllerTemp[2],VelocityAct[2];
+int velocity[2],DcCurrent[2],MotorCrr[2],VelocityAVG[2];
+uint8_t MotorTemp[2],ControllerTemp[2];
+short int Phase_A_Crr[2],Phase_B_Crr[2],DcLink[2],Torque[2],Warnings[2];
 
 /* USER CODE END PV */
 
@@ -136,6 +138,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
       {
+	  /*en un principio el acelerador y freno iban a venir de una lectura de ADC
+	   * o variable externa, se setean y entran a la funcion control motores*/
 	  direction=ADC_val[1];
 	  throttle=ADC_val[0];
 	  brake=0;

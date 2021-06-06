@@ -334,24 +334,7 @@ void DMA2_Stream0_IRQHandler(void)
 
 /* USER CODE BEGIN 1 */
 
-double promedio(int valor_ingresado)
-{
-	//almacena 50 valores
-static int valores[50],j=0;
-double promedio;
-int i,temp=0;
-/*por un lado hago el almacenamiento de los valores*/
-valores[j++]=valor_ingresado;
-if(j==49)
-	j=0;
-/*por el otro lado hago el promedio*/
-for(i=0;i<50;i++)
-{
-	temp=temp + valores[i] ;
-}
-	promedio=(double)temp/50;
-return promedio;
-}
+
 
 //
 

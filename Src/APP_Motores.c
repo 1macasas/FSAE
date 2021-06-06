@@ -8,17 +8,17 @@
 #include "APP_Motores.h"
 #include "DRV_Motor_config.h"
 #include "mini_backend.h"
-
 #include "main.h"
+
 /*private variables*/
-//cycles va a tener la relacion entre pido data-envio velocidad.
-int cycles=0;
-char freq=3; 												//ms
+											//ms
 /// variables externas
 extern uint8_t	buffer_Rx_msg[8];
 extern CAN_RxHeaderTypeDef pRxHeader;
 extern uint16_t status[2];
-extern int velocity[2],DcLink[2],DcCurrent[2],MotorTemp[2],MotorCrr[2],Torque[2],VelocityAVG[2],ControllerTemp[2],VelocityAct[2];
+extern int velocity[2],DcCurrent[2],MotorCrr[2],VelocityAVG[2];
+extern uint8_t MotorTemp[2],ControllerTemp[2];
+extern short int Phase_A_Crr[2],Phase_B_Crr[2],DcLink[2],Torque[2],Warnings[2];
 extern uint8_t FLAG_OP;
 extern uint8_t FLAG_USART,FLAG_CAN;
 extern TIM_HandleTypeDef htim2;
@@ -33,14 +33,12 @@ extern uint32_t ADC_val[ENTRADAS_ADC];
 void control_motors(int throttle,int direction,int brake)
 {
 	/*control_nodos es una variable se encarga de enviar la controlword a cada nodo, el contador va a controlar la data a pedir de los nodos*/
-	static uint8_t nodo=MOTOR1,control_nodos[2],contador[2];
-	static int tickstart;
+	static uint8_t nodo=MOTOR1,control_nodos[2];
 	uint32_t Id;
 	uint8_t buffer_analisis[8],i=0,bytes;
-	uint32_t pedal1,pedal2;
 
 	//	ANALIZO MENSAJE CAN-- SI HAY
-	//Armo un buffer de lectura, luego bajo el flag y analizo el mensaje
+	//Armo un buffer de lectura para que no se mezclen los mensajes si llega uno neuvo, luego bajo el flag y analizo el mensaje
 	if(FLAG_CAN==PENDING)
 	{
 	FLAG_CAN=READING;
@@ -69,11 +67,8 @@ void control_motors(int throttle,int direction,int brake)
 		case(INITIALIZATION):		// configuro ambos nodos y arranco mi base de tiempo.
 			control_nodos[0]=NOTSEND;
 			control_nodos[1]=NOTSEND;
-			contador[0]=1;
-			contador[1]=1;
 			status[0]=WFBOOTUP;
 			status[1]=WFBOOTUP;
-			tickstart= HAL_GetTick();
 			break;
 
 		case(WFBOOTUP):
@@ -111,7 +106,7 @@ void control_motors(int throttle,int direction,int brake)
 		case(OPERATIONAL):
 					if(control_nodos[nodo-1]==NOTSEND)
 					{
-						control_nodos[nodo-1]= change_state(nodo,OPERATIONAL,status[nodo-1] );
+						control_nodos[nodo-1]=change_state(nodo,OPERATIONAL,status[nodo-1] );
 					}
 
 				if(run_motor_n(ADC_val[0],ADC_val[1])!=HAL_OK)
@@ -127,6 +122,7 @@ void control_motors(int throttle,int direction,int brake)
 						FLAG_OP=0;
 					}
 					break;
+
 		case(STOPPED):
 				control_nodos[0]=NOTSEND;
 				control_nodos[1]=NOTSEND;
@@ -140,9 +136,7 @@ void control_motors(int throttle,int direction,int brake)
 				HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
 				break;
 	}
-	/*Reseteo Variable control en el caso de volver a preoperational*/
-	/* controlo alternadamente motor 1 y motor 2 --- RESETEO VARUABLES
-	 *
+	/* Alterno los nodos entre el motor 1 y 2 a manejar
 	 */
 	if(nodo==MOTOR1)
 	{
@@ -153,7 +147,7 @@ void control_motors(int throttle,int direction,int brake)
 		nodo=MOTOR1;
 	}
 
-	//PIDO INFO (CONSTANTEMENTE)---ciclos¿?7
+	//PIDO INFO (CONSTANTEMENTE)
 	ask_for_info();
 
  }

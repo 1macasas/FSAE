@@ -7,7 +7,9 @@
 //
 #include "SystemInit.h"
 
-extern short int velocity[2],DcLink[2],DcCurrent[2],MotorTemp[2],MotorCrr[2],Torque[2],VelocityAVG[2],ControllerTemp[2],VelocityAct[2];
+extern int velocity[2],DcCurrent[2],MotorCrr[2],VelocityAVG[2];
+extern uint8_t MotorTemp[2],ControllerTemp[2];
+extern short int Phase_A_Crr[2],Phase_B_Crr[2],DcLink[2],Torque[2],Warnings[2];
 CAN_FilterTypeDef sFilterConfig;
 
 void mysystem_start(void)
@@ -55,18 +57,17 @@ void mysystem_start(void)
 	  DcLink[1]=0xffff;
 	  DcCurrent[0]=0xffff;
 	  DcCurrent[1]=0xffff;
-	  MotorTemp[0]=0xffff;
-	  MotorTemp[1]=0xffff;
+	  MotorTemp[0]=0xff;
+	  MotorTemp[1]=0xff;
 	  MotorCrr[0]=0xffff;
 	  MotorCrr[1]=0xffff;
 	  Torque[0]=0xffff;
 	  Torque[1]=0xffff;
 	  VelocityAVG[0]=0xffff;
 	  VelocityAVG[1]=0xffff;
-	  ControllerTemp[0]=0xffff;
-	  ControllerTemp[1]=0xffff;
-	  VelocityAct[0]=0xffff;
-	  VelocityAct[1]=0xffff;
+	  ControllerTemp[0]=0xff;
+	  ControllerTemp[1]=0xff;
+
 }
 
 
